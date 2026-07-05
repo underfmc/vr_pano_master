@@ -1,0 +1,286 @@
+{
+  "33": {
+    "inputs": {
+      "image": "FIRST_PASS_IMAGE"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Загрузить изображение"
+    }
+  },
+  "34": {
+    "inputs": {
+      "upscale_method": "lanczos",
+      "width": 1024,
+      "height": 1024,
+      "crop": "disabled",
+      "image": [
+        "33",
+        0
+      ]
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "Масштабировать изображение"
+    }
+  },
+  "35": {
+    "inputs": {
+      "image": "MAIN_MASK"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Загрузить изображение"
+    }
+  },
+  "36": {
+    "inputs": {
+      "channel": "red",
+      "image": [
+        "35",
+        0
+      ]
+    },
+    "class_type": "ImageToMask",
+    "_meta": {
+      "title": "Преобразовать изображение в маску"
+    }
+  },
+  "37": {
+    "inputs": {
+      "ckpt_name": "Realistic_Vision_V5.1.safetensors"
+    },
+    "class_type": "CheckpointLoaderSimple",
+    "_meta": {
+      "title": "CheckpointLoaderSimple — SD1.5, must match sd15 IPAdapter/ControlNet"
+    }
+  },
+  "38": {
+    "inputs": {
+      "grow_mask_by": 8,
+      "pixels": [
+        "34",
+        0
+      ],
+      "vae": [
+        "37",
+        2
+      ],
+      "mask": [
+        "36",
+        0
+      ]
+    },
+    "class_type": "VAEEncodeForInpaint",
+    "_meta": {
+      "title": "Кодировать VAE (для инпейнтинга)"
+    }
+  },
+  "39": {
+    "inputs": {
+      "image": "FACE_CANNY"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Загрузить изображение"
+    }
+  },
+  "40": {
+    "inputs": {
+      "upscale_method": "lanczos",
+      "width": 1024,
+      "height": 1024,
+      "crop": "disabled",
+      "image": [
+        "39",
+        0
+      ]
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "Масштабировать изображение"
+    }
+  },
+  "41": {
+    "inputs": {
+      "control_net_name": "diffusion_pytorch_model.safetensors"
+    },
+    "class_type": "ControlNetLoader",
+    "_meta": {
+      "title": "Загрузить модель ControlNet"
+    }
+  },
+  "43": {
+    "inputs": {
+      "strength": 0.45,
+      "start_percent": 0.0,
+      "end_percent": 0.6,
+      "positive": [
+        "44",
+        0
+      ],
+      "negative": [
+        "45",
+        0
+      ],
+      "control_net": [
+        "41",
+        0
+      ],
+      "image": [
+        "40",
+        0
+      ],
+      "vae": [
+        "37",
+        2
+      ]
+    },
+    "class_type": "ControlNetApplyAdvanced",
+    "_meta": {
+      "title": "Применить ControlNet"
+    }
+  },
+  "44": {
+    "inputs": {
+      "text": "MAIN_POSITIVE_PROMPT",
+      "clip": [
+        "37",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Кодирование текста CLIP (Запрос)"
+    }
+  },
+  "45": {
+    "inputs": {
+      "text": "MAIN_NEGATIVE_PROMPT",
+      "clip": [
+        "37",
+        1
+      ]
+    },
+    "class_type": "CLIPTextEncode",
+    "_meta": {
+      "title": "Кодирование текста CLIP (Запрос)"
+    }
+  },
+  "46": {
+    "inputs": {
+      "weight": 0.68,
+      "weight_type": "linear",
+      "combine_embeds": "concat",
+      "start_at": 0.0,
+      "end_at": 0.75,
+      "embeds_scaling": "V only",
+      "model": [
+        "37",
+        0
+      ],
+      "ipadapter": [
+        "48",
+        0
+      ],
+      "image": [
+        "47",
+        0
+      ],
+      "clip_vision": [
+        "49",
+        0
+      ]
+    },
+    "class_type": "IPAdapterAdvanced",
+    "_meta": {
+      "title": "IPAdapter Advanced — strong style only inside main mask"
+    }
+  },
+  "47": {
+    "inputs": {
+      "image": "STREET_REFERENCE"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "Загрузить изображение"
+    }
+  },
+  "48": {
+    "inputs": {
+      "ipadapter_file": "ip-adapter_sd15.safetensors"
+    },
+    "class_type": "IPAdapterModelLoader",
+    "_meta": {
+      "title": "IPAdapter Model Loader"
+    }
+  },
+  "49": {
+    "inputs": {
+      "clip_name": "model.safetensors"
+    },
+    "class_type": "CLIPVisionLoader",
+    "_meta": {
+      "title": "Загрузить видение CLIP"
+    }
+  },
+  "50": {
+    "inputs": {
+      "seed": 1,
+      "steps": 28,
+      "cfg": 5.8,
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "denoise": 0.4,
+      "model": [
+        "46",
+        0
+      ],
+      "positive": [
+        "43",
+        0
+      ],
+      "negative": [
+        "43",
+        1
+      ],
+      "latent_image": [
+        "38",
+        0
+      ]
+    },
+    "class_type": "KSampler",
+    "_meta": {
+      "title": "KSampler"
+    }
+  },
+  "51": {
+    "inputs": {
+      "samples": [
+        "50",
+        0
+      ],
+      "vae": [
+        "37",
+        2
+      ]
+    },
+    "class_type": "VAEDecode",
+    "_meta": {
+      "title": "Декодировать VAE"
+    }
+  },
+  "52": {
+    "inputs": {
+      "filename_prefix": "SAVE_PREFIX",
+      "images": [
+        "51",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "Сохранить изображение"
+    }
+  }
+}

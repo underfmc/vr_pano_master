@@ -1,0 +1,49 @@
+project:
+  id: demo_tyumen_house
+  root: projects/demo_tyumen_house
+  lat: 57.153000
+  lon: 65.542000
+  radius_m: 800
+
+main_building:
+  levels: 16
+  floor_height_m: 3.0
+  height_m: 48
+  roof_type: flat
+
+camera:
+  preset: sales_oblique
+  altitude_m: 100
+  offset_east_m: 80
+  offset_north_m: -70
+
+render:
+  cube_face_size: 1024
+  engine: BLENDER_EEVEE_NEXT
+
+ai:
+  main_model: claude-sonnet-5
+  vision_model: gemini-3-5-flash
+  cheap_model: qwen3-7-plus
+  code_model: claude-sonnet-5
+  review_model: gpt-5-5
+
+prompts:
+  first_positive: photorealistic aerial drone cubemap face of a Russian residential district, realistic apartment buildings, courtyards, roads, parking lots, sidewalks, trees, overcast daylight, natural colors, real estate aerial photography, consistent lighting, realistic roofs and facades, high detail
+  first_negative: cartoon, illustration, 3d render, game asset, text, labels, watermark, logo, fake map markers, satellite map texture, blurry, low quality
+  main_positive: the main residential building matches the street reference photo, realistic facade material, same brick color, same window style, realistic roof, accurate building shape, photorealistic drone view
+  main_negative: wrong facade, wrong roof, extra floors, distorted windows, text, logo, watermark, blurry, low quality
+
+comfy:
+  first_pass_workflow_api_json: workflow_templates/first_pass.json
+  main_pass_workflow_api_json: workflow_templates/main_pass.json
+  workflow_api_json: workflow_templates/first_pass.json
+  output_prefix: vrpano
+  face_size: 1024
+  steps: 30
+  cfg: 6.0
+  denoise: 0.58
+  main_steps: 28
+  main_cfg: 5.8
+  main_denoise: 0.42
+  main_faces: auto
