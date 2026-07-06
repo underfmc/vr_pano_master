@@ -1,3 +1,0 @@
-{
-  "README": "This is a placeholder. In ComfyUI enable Dev mode -> Save (API Format). Your workflow should contain placeholder strings in LoadImage/SaveImage node inputs: FACE_COLOR, FACE_CANNY, STREET_REFERENCE, SAVE_PREFIX. Then set comfy.workflow_api_json in projects/<project>/config.yaml."
-}

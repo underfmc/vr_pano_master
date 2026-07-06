@@ -1,4 +1,48 @@
-.venv/
-.history/
-.env
+# Python
 __pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+*.egg
+
+# Virtual environment
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.history/
+
+# Environment variables
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Project build artifacts
+projects/
+projects/*/blockout/
+projects/*/control/
+projects/*/comfy_output/
+projects/*/pbr_output/
+projects/*/output/
+projects/*/logs/
+projects/*/web/
+projects/*/source/
+projects/*/scene_config.json
+assets/
+
+# Generated street panorama files (can be re-downloaded)
+# projects/*/source/street/
+# projects/*/source/street_reference_collage.png
+
+# ComfyUI result metadata
+projects/*/comfy_output/*_comfy_result.json

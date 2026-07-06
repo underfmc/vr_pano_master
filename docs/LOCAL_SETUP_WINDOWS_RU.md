@@ -1,132 +1,103 @@
-# Локальная настройка под вашу машину
+# Локальная настройка (Windows)
 
-## Пути
+## Требования
 
-ComfyUI:
+- **Python 3.10+** (установлен в `C:\Users\lol07\AppData\Local\Programs\Python\Python312`)
+- **Blender 4.0+** (установлен в `C:\Users\lol07\AppData\Local\Programs\Blender 3D\`)
+- **ComfyUI** (опционально, для AI-полировки): `C:\dev_shir\IRR_2026\furn_gen\ComfyUI-master`
+- **GPU**: NVIDIA RTX 5070 (12GB VRAM)
 
-```text
-C:\dev_shir\IRR_2026\furn_gen\ComfyUI-master
-```
+## Установка
 
-Blender:
-
-```text
-C:\Users\lol07\AppData\Local\Programs\Blender 3D\blender.exe
-```
-
-Checkpoint:
-
-```text
-Realistic_Vision_V5.1.safetensors
-```
-
-ControlNet Canny:
-
-```text
-diffusion_pytorch_model.safetensors
+```bash
+cd C:\dev_shir\IRR_2026\vr_pano_master
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+copy .env.example .env
 ```
 
 ## .env
 
-В `vr_pano_master/.env` добавьте:
+Отредактируйте `.env` (или скопируйте из `.env.example`):
 
 ```env
+# ComfyUI (опционально, для ai-polish)
 COMFYUI_PATH=C:/dev_shir/IRR_2026/furn_gen/ComfyUI-master
 COMFYUI_URL=http://127.0.0.1:8188
+
+# Blender
 BLENDER_EXE=C:/Users/lol07/AppData/Local/Programs/Blender 3D/blender.exe
 
+# ComfyUI models
 COMFY_CHECKPOINT=Realistic_Vision_V5.1.safetensors
 COMFY_CONTROLNET_CANNY=diffusion_pytorch_model.safetensors
+COMFY_IPADAPTER=ip-adapter_sd15.safetensors
+COMFY_CLIP_VISION=model.safetensors
 
-YANDEX_STATIC_API_KEY=ваш_ключ_яндекс_static_maps
-YANDEX_MAPS_API_KEY=ваш_ключ_если_используете_общее_имя
+# Яндекс API (опционально)
+YANDEX_STATIC_API_KEY=
 
+# AI (опционально)
+AITUNNEL_API_KEY=
+AITUNNEL_BASE_URL=https://api.aitunnel.ru/v1
 AITUNNEL_MODEL=claude-sonnet-5
-AITUNNEL_VISION_MODEL=gemini-3-5-flash
-AITUNNEL_CHEAP_MODEL=qwen3-7-plus
-AITUNNEL_CODE_MODEL=claude-sonnet-5
-AITUNNEL_REVIEW_MODEL=gpt-5-5
+AITUNNEL_VISION_MODEL=gemini-3.5-flash
 ```
 
-## Проверка окружения
+## Проверка
 
 ```bash
 python master.py doctor
 ```
 
-Команда проверит:
-
-- путь к ComfyUI;
-- путь к Blender;
-- наличие checkpoint;
-- наличие ControlNet Canny;
-- наличие ключа Yandex Static API;
-- наличие `yandex-pano-downloader`.
-
-## Установка yandex-pano-downloader из GitHub
+## Полный проход (новый PBR pipeline)
 
 ```bash
-python master.py setup-yandex-pano --install-deps
+# 1. Создать проект
+python master.py init --project my_house --lat 57.153 --lon 65.542 --levels 16
+
+# 2. Скачать OSM-данные
+python master.py fetch-osm --project my_house
+
+# 3. Скачать Яндекс.Панорамы (опционально, для reference)
+python master.py fetch-yandex-pano --project my_house
+
+# 4. Рендер PBR equirectangular панорамы
+python master.py render-pbr --project my_house --width 4096
+
+# 5. (Опционально) AI-полировка
+python master.py ai-polish --project my_house --denoise 0.25
 ```
 
-Команда скачает репозиторий/файлы в:
-
-```text
-vr_pano_master/tools/yandex-pano-downloader/
-```
-
-И выведет строку для `.env`:
-
-```env
-YANDEX_PANO_SCRIPT=C:/.../vr_pano_master/tools/yandex-pano-downloader/pano.py
-```
-
-## Полный тестовый проход
+## Полный проход (одной командой)
 
 ```bash
-python master.py init --project tyumen_house --lat 57.153 --lon 65.542 --levels 16
-python master.py fetch-osm --project tyumen_house
-python master.py fetch-satellite-yandex --project tyumen_house --zoom 17 --size 2048
-python master.py fetch-yandex-pano --project tyumen_house
-python master.py make-collage --project tyumen_house
-python master.py render-blockout --project tyumen_house
-python master.py make-control-maps --project tyumen_house
+python master.py run-auto --project my_house --lat 57.153 --lon 65.542 --levels 16
 ```
 
-Дальше нужны два экспортированных ComfyUI workflow в API JSON:
+## Legacy: Cubemap pipeline
 
-```text
-workflow_templates/first_pass.json
-workflow_templates/main_pass.json
-```
-
-Подробная схема: `docs/COMFY_TWO_PASS_WORKFLOWS_RU.md`.
-
-Затем:
+Старый пайплайн (cubemap + ComfyUI two-pass) всё ещё доступен:
 
 ```bash
-python master.py run-comfy --project tyumen_house --stage all
-python master.py stitch --project tyumen_house
+python master.py render-blockout --project my_house
+python master.py make-control-maps --project my_house
+python master.py run-comfy --project my_house --stage all
+python master.py stitch --project my_house
 ```
 
-## Запуск ComfyUI
+Но рекомендуется использовать новый PBR pipeline.
+
+## Запуск ComfyUI (для AI-полировки)
 
 ```bash
 cd C:\dev_shir\IRR_2026\furn_gen\ComfyUI-master
 python main.py --listen 127.0.0.1 --port 8188
 ```
 
-
-## Опционально: AITunnel для анализа входов и prompt'ов
-
-После спутника и street-collage можно запустить vision-анализ:
+## Установка yandex-pano-downloader
 
 ```bash
-python master.py ai-analyze-inputs --project tyumen_house
-```
-
-Затем сгенерировать prompt'ы для ComfyUI и применить их в `config.yaml`:
-
-```bash
-python master.py ai-suggest-prompts --project tyumen_house --apply
+python master.py setup-yandex-pano --install-deps
 ```

@@ -1,11 +1,12 @@
+# VR Pano Master — Python Dependencies
+# Install: pip install -r requirements.txt
+
+# Core
 requests>=2.31.0
 Pillow>=10.0.0
-python-dotenv>=1.0.0
 PyYAML>=6.0.0
-tqdm>=4.66.0
-numpy>=1.26.0
-opencv-python>=4.9.0
-py360convert>=1.0.4
+python-dotenv>=1.0.0
+
+# AI Polish (optional, for ComfyUI img2img)
 openai>=1.40.0
-aiohttp>=3.9.0
-progressbar2>=4.4.0
+py360convert
